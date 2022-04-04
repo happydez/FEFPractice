@@ -5,3 +5,6 @@ dotnet new classlib -lang c# -n AutoLot.Dal -o .\AutoLot.Dal -f net6.
 dotnet add AutoLot.Dal reference AutoLot.Models
 
 dotnet ef dbcontext scaffold "server=DESKTOP-NS0TRV3\SQLEXPRESS02;Database=AutoLot;Trusted_Connection=true;" Microsoft.EntityFrameworkCore.SqlServer -d -c ApplicationDbContext --context-namespace AutoLot.Dal.EfStructures --context-dir EfStructures --no-onconfiguring -n AutoLot.Models.Entities -o C:\FEFPractice\AutoLot.Models\Entities
+
+(in AutoLot.Dal)
+dotnet ef migrations add Initial -o C:\FEFPractice\AutoLot.Dal\EfStructures\Migrations -c AutoLot.Dal.EfStructures.ApplicationDbContext

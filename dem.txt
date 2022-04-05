@@ -35,3 +35,7 @@ dotnet ef database update UpdateEntities -c AutoLot.Dal.EfStructures.Application
 
 dotnet ef migrations remove SQL -o C:\FEFPractice\AutoLot.Dal\EfStructures\Migrations -c AutoLot.Dal.EfStructures.ApplicationDbContext
 dotnet ef database update SQL -c AutoLot.Dal.EfStructures.ApplicationDbContext
+
+dotnet new xunit -lang c# -n AutoLot.Dal.Tests -o C:\FEFPractice\AutoLot.Dal.Tests
+dotnet add AutoLot.Dal.Tests reference AutoLot.Dal
+dotnet add AutoLot.Dal.Tests reference AutoLot.Models

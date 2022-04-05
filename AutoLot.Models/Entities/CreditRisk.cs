@@ -1,16 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using AutoLot.Models.Entities.Owned;
 
 namespace AutoLot.Models.Entities
 {
-    public partial class CreditRisk
+    [Table("CreditRisks", Schema = "dbo")]
+    public partial class CreditRisk : BaseEntity
     {
-        public int Id { get; set; }
-        public string FirstName { get; set; } = null!;
-        public string LastName { get; set; } = null!;
+        public Person PersonalInformation { get; set; } = new Person();
         public int CustomerId { get; set; }
-        public byte[]? TimeStamp { get; set; }
 
-        public virtual Customer Customer { get; set; } = null!;
+        [ForeignKey(nameof(CustomerId))]
+        [InverseProperty(nameof(Customer.CreditRisks))]
+        public Customer? CustomerNavigation { get; set; }
     }
 }

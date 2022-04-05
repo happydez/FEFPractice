@@ -1,22 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
+using AutoLot.Models.Entities.Owned;
 
 namespace AutoLot.Models.Entities
 {
-    public partial class Customer
+    [Table("Customers", Schema = "dbo")]
+    public partial class Customer : BaseEntity
     {
-        public Customer()
-        {
-            CreditRisks = new HashSet<CreditRisk>();
-            Orders = new HashSet<Order>();
-        }
+        public Person PersonalInformation { get; set; } = new Person();
 
-        public int Id { get; set; }
-        public string FirstName { get; set; } = null!;
-        public string LastName { get; set; } = null!;
-        public byte[]? TimeStamp { get; set; }
+        [JsonIgnore]
+        [InverseProperty(nameof(CreditRisk.CustomerNavigation))]
+        public IEnumerable<CreditRisk> CreditRisks { get; set; } = new List<CreditRisk>();
 
-        public virtual ICollection<CreditRisk> CreditRisks { get; set; }
-        public virtual ICollection<Order> Orders { get; set; }
+        [JsonIgnore]
+        [InverseProperty(nameof(Order.CustomerNavigation))]
+        public IEnumerable<Order> Orders { get; set; } = new List<Order>();
     }
 }

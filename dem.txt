@@ -8,3 +8,24 @@ dotnet ef dbcontext scaffold "server=DESKTOP-NS0TRV3\SQLEXPRESS02;Database=AutoL
 
 (in AutoLot.Dal)
 dotnet ef migrations add Initial -o C:\FEFPractice\AutoLot.Dal\EfStructures\Migrations -c AutoLot.Dal.EfStructures.ApplicationDbContext
+
+dotnet ef migrations list -c AutoLot.Dal.EfStructures.ApplicationDbContext
+
+~ if sync local sql
+	dotnet ef database drop -f
+	dotnet ef database update Initial -c AutoLot.Dal.EfStructures.ApplicationDbContext
+~ else (exm: Azure SQL)
+	dotnet ef migrations script --idempotent -o FirstMigration.sql
+
+	IF OBJECT_ID(N'[__EFMigrationHistroy]') IS NULL
+	BEGIN
+		CREATE TABLE [__EFMigrationHistroy] (
+			[MigrationId] NVARCHAR(150) NOT NULL,
+			[ProductVersion] NVARCHAR(32) NOT NULL,
+			CONSTRAINT [PK___EFMigrationsHistory] PRIMARY KEY ([MigrationId])
+		);
+	END;
+	GO
+
+	INSERT INTO [__EFMigrationHistroy] ([MigrationId], [ProductVersion])
+	VALUES (N'20220404215425_Initial', N'6.0.3');

@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
 using AutoLot.Models.Entities;
+using AutoLot.Models.Entities.Owned;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace AutoLot.Dal.EfStructures
 {
@@ -19,7 +22,7 @@ namespace AutoLot.Dal.EfStructures
 
         public virtual DbSet<CreditRisk> CreditRisks { get; set; } = null!;
         public virtual DbSet<Customer> Customers { get; set; } = null!;
-        public virtual DbSet<Inventory> Inventories { get; set; } = null!;
+        public virtual DbSet<Car> Cars { get; set; } = null!;
         public virtual DbSet<Make> Makes { get; set; } = null!;
         public virtual DbSet<Order> Orders { get; set; } = null!;
 
@@ -27,17 +30,22 @@ namespace AutoLot.Dal.EfStructures
         {
             modelBuilder.Entity<CreditRisk>(entity =>
             {
-                entity.HasIndex(e => e.CustomerId, "IX_CreditRisks_CustomerId");
+                entity.OwnsOne(owns => owns.PersonalInformation, navigation =>
+                {
+                    navigation.Property<string>(nameof(Person.FirstName))
+                        .HasColumnName(nameof(Person.FirstName))
+                        .HasColumnType("nvarchar(50)");
 
-                entity.Property(e => e.FirstName).HasMaxLength(50);
+                    navigation.Property<string>(nameof(Person.LastName))
+                        .HasColumnName(nameof(Person.LastName))
+                        .HasColumnType("nvarchar(50)");
 
-                entity.Property(e => e.LastName).HasMaxLength(50);
+                    navigation.Property(p => p.FullName)
+                        .HasColumnName(nameof(Person.FullName))
+                        .HasComputedColumnSql("[LastName] + ', ' + [FirstName]");
+                });
 
-                entity.Property(e => e.TimeStamp)
-                    .IsRowVersion()
-                    .IsConcurrencyToken();
-
-                entity.HasOne(d => d.Customer)
+                entity.HasOne(d => d.CustomerNavigation)
                     .WithMany(p => p.CreditRisks)
                     .HasForeignKey(d => d.CustomerId)
                     .HasConstraintName("FK_CreditRisks_Customers");
@@ -45,16 +53,15 @@ namespace AutoLot.Dal.EfStructures
 
             modelBuilder.Entity<Customer>(entity =>
             {
-                entity.Property(e => e.FirstName).HasMaxLength(50);
-
-                entity.Property(e => e.LastName).HasMaxLength(50);
-
-                entity.Property(e => e.TimeStamp)
-                    .IsRowVersion()
-                    .IsConcurrencyToken();
+                entity.OwnsOne(owns => owns.PersonalInformation, navigation =>
+                {
+                    navigation.Property(p => p.FirstName).HasColumnName(nameof(Person.FirstName));
+                    navigation.Property(p => p.LastName).HasColumnName(nameof(Person.LastName));
+                    navigation.Property(p => p.FullName).HasColumnName(nameof(Person.FullName)).HasComputedColumnSql("[LastName] + ', ' + [FirstName]");
+                });
             });
 
-            modelBuilder.Entity<Inventory>(entity =>
+            modelBuilder.Entity<Car>(entity =>
             {
                 entity.ToTable("Inventory");
 
@@ -68,8 +75,8 @@ namespace AutoLot.Dal.EfStructures
                     .IsRowVersion()
                     .IsConcurrencyToken();
 
-                entity.HasOne(d => d.Make)
-                    .WithMany(p => p.Inventories)
+                entity.HasOne(d => d.MakeNavigation)
+                    .WithMany(p => p.Cars)
                     .HasForeignKey(d => d.MakeId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Make_Inventory");
@@ -95,13 +102,13 @@ namespace AutoLot.Dal.EfStructures
                     .IsRowVersion()
                     .IsConcurrencyToken();
 
-                entity.HasOne(d => d.Car)
+                entity.HasOne(d => d.CarNavigation)
                     .WithMany(p => p.Orders)
                     .HasForeignKey(d => d.CarId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Orders_Inventory");
 
-                entity.HasOne(d => d.Customer)
+                entity.HasOne(d => d.CustomerNavigation)
                     .WithMany(p => p.Orders)
                     .HasForeignKey(d => d.CustomerId)
                     .HasConstraintName("FK_Orders_Customers");

@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using AutoLot.Dal.Exceptions;
+using AutoLot.Models.ViewModels;
 
 namespace AutoLot.Dal.EfStructures
 {
@@ -76,9 +77,15 @@ namespace AutoLot.Dal.EfStructures
         public DbSet<Car>? Cars { get; set; } = null!;
         public DbSet<Make>? Makes { get; set; } = null!;
         public DbSet<Order>? Orders { get; set; } = null!;
+        public DbSet<CustomerOrderViewModel>? CustomerOrderViewModel { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<CustomerOrderViewModel>(entity =>
+            {
+                entity.HasNoKey().ToView("CustomerOrderView", "dbo");
+            });
+
             modelBuilder.Entity<SeriLogEntry>(entity =>
             {
                 entity.Property(e => e.Properties).HasColumnName("Xml");

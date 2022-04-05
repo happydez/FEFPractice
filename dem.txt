@@ -29,3 +29,9 @@ dotnet ef migrations list -c AutoLot.Dal.EfStructures.ApplicationDbContext
 
 	INSERT INTO [__EFMigrationHistroy] ([MigrationId], [ProductVersion])
 	VALUES (N'20220404215425_Initial', N'6.0.3');
+
+dotnet ef migrations add UpdateEntities -o C:\FEFPractice\AutoLot.Dal\EfStructures\Migrations -c AutoLot.Dal.EfStructures.ApplicationDbContext
+dotnet ef database update UpdateEntities -c AutoLot.Dal.EfStructures.ApplicationDbContext
+
+dotnet ef migrations remove SQL -o C:\FEFPractice\AutoLot.Dal\EfStructures\Migrations -c AutoLot.Dal.EfStructures.ApplicationDbContext
+dotnet ef database update SQL -c AutoLot.Dal.EfStructures.ApplicationDbContext
